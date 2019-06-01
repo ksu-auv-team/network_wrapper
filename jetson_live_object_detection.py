@@ -17,7 +17,7 @@ class JetsonLiveObjectDetection():
         self.camera = cv2.VideoCapture(camera)
         self.model = model
         self.rate = float(1. / fps)
-        self.detector = ObjectDetection('./data/' + self.model + '/' + self.model '_trt_graph.pb')
+        self.detector = ObjectDetection('./data/' + self.model + '/' + self.model + '_trt_graph.pb')
         self.thresh = thresh
 
     def _visualizeDetections(self, img, scores, boxes, classes, num_detections):
