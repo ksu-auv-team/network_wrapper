@@ -18,7 +18,7 @@ class JetsonLiveObjectDetection():
         self.model = model
         self.rate = float(1. / fps)
         self.detector = ObjectDetection('./data/' + self.model + '/' + self.model + '_trt_graph.pb')
-        self.thresh = thresh
+        self.thresh = float(thresh)
 
     def _visualizeDetections(self, img, scores, boxes, classes, num_detections):
         cols = img.shape[1]
