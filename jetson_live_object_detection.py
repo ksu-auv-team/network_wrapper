@@ -64,6 +64,7 @@ class JetsonLiveObjectDetection():
             
             if not self.debug:
                 #TODO: Add runtime ros publishers
+                print("TODO")
 
             print ("Debug: Running at: " + str(1.0/(time.time() - curr_time)) + " Hz.")
 
