@@ -38,7 +38,7 @@ class JetsonLiveObjectDetection():
                     bottom = int(bbox[2] * rows)
                     thickness = int(4 * score)
                     cv2.rectangle(img, (x, y), (right, bottom), (125,255, 21), thickness=thickness)
-                    cv2.putText(img, self.detector.labels[str(classId)] + ': ' str(score), (x,y), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
+                    cv2.putText(img, self.detector.labels[str(classId)] + ': ' + str(score), (x,y), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
 
         print ("Found objects: " + str(' '.join(detections)) + ".")
         if (not args.noVideo):
