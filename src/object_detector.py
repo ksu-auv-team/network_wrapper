@@ -7,16 +7,23 @@ import sys
 
 """ TensorFlow detection using TRT optimized graph"""
 class ObjectDetection():
-    def __init__(self, detection_model_path = './data/ssd_mobilenet_v2_coco_trt_graph.pb'):
-        self.detection_model_path = detection_model_path
-        self.labels = self._getLabels()
+    def __init__(self, detection_model, label_map='label_map.pbtxt'):
+        self.detection_model = detection_model
+        self.detection_model_path = './data/' + detection_model + '/' + detection_model + '_trt_graph.pb'
+        self.labels = self._getLabels(label_map)
 
-    def _getLabels(self):
+    def _getLabels(self, label_map):
         labels = {}
-        with open('./data/coco_classes.json') as fh:
+        with open('./data/' + self.detection_model + '/' + label_map)  as fh:
             for line in fh:
-                label, des = line.strip().split(': ', 1)
-                labels[label] = des.strip()
+                if ("id:" in line):
+                    label, id_num = line.strip().split(': ', 1)
+                elif ("name:" in line):
+                    label, name = line.strip().split(': ', 1)
+                    name = name.replace("'", "")
+                else:
+                    continue
+                labels[id_num] = name.strip()
         return labels
 
     def detect(self, frame):

@@ -17,7 +17,7 @@ class JetsonLiveObjectDetection():
         self.camera = cv2.VideoCapture(camera)
         self.model = model
         self.rate = float(1. / fps)
-        self.detector = ObjectDetection('./data/' + self.model + '/' + self.model + '_trt_graph.pb')
+        self.detector = ObjectDetection(self.model, label_map=args.label)
         self.thresh = float(thresh)
 
     def _visualizeDetections(self, img, scores, boxes, classes, num_detections):
@@ -93,6 +93,7 @@ if __name__ == "__main__":
     parser.add_argument('-v', '--verbosity', action='store_true', help="set logging verbosity (doesn't work)")
     parser.add_argument('-d', '--debug', action='store_true', help='Runs only the network without ROS. (doesn\'t work)')
     parser.add_argument('-c', '--camera', default='/dev/video0', help='/path/to/video, defaults to /dev/video0')
+    parser.add_argument('-l', '--label', default='label_map.pbtxt', help='Override the name of the label map in your model directory. Defaults to label_map.pbtxt')
     parser.add_argument('--thresh', default=0.4, help='Override the default detection threshold. Default = 0.4')
     parser.add_argument('--noVideo', action='store_true', help='Will not display live video feed, will still display in terminal.')
     
