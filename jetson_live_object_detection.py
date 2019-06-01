@@ -98,7 +98,7 @@ if __name__ == "__main__":
     
     args = parser.parse_args()
 
-    live_detection = JetsonLiveObjectDetection(model=args.network, camera=args.camera, debug=args.debug, thresh=args.thresh fps=10.0)
+    live_detection = JetsonLiveObjectDetection(model=args.network, camera=args.camera, debug=args.debug, thresh=args.thresh, fps=10.0)
     live_detection.start()
     
 
