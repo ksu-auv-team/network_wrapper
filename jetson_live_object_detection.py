@@ -38,7 +38,7 @@ class JetsonLiveObjectDetection():
                     bottom = int(bbox[2] * rows)
                     thickness = int(4 * score)
                     cv2.rectangle(img, (x, y), (right, bottom), (125,255, 21), thickness=thickness)
-                    cv2.putText(img, self.detector.labels[str(classId)] + ': ' + str(score), (x,y), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
+                    cv2.putText(img, self.detector.labels[str(classId)] + ': ' + str(round(score,3)), (x,y), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
 
         print ("Found objects: " + str(' '.join(detections)) + ".")
         if (not args.noVideo):
@@ -91,7 +91,7 @@ if __name__ == "__main__":
     parser.add_argument('-t', '--training_set', help="specify set of targets to use (doesn't work)")
     parser.add_argument('-n', '--network', default="ssd_mobilenet_v1_coco", help="set name of neural network graph to use")
     parser.add_argument('-v', '--verbosity', action='store_true', help="set logging verbosity (doesn't work)")
-    parser.add_argument('-d', '--debug', action='store_true', help='Runs only the network without ROS.')
+    parser.add_argument('-d', '--debug', action='store_true', help='Runs only the network without ROS. (doesn\'t work)')
     parser.add_argument('-c', '--camera', default='/dev/video0', help='/path/to/video, defaults to /dev/video0')
     parser.add_argument('--thresh', default=0.4, help='Override the default detection threshold. Default = 0.4')
     parser.add_argument('--noVideo', action='store_true', help='Will not display live video feed, will still display in terminal.')
