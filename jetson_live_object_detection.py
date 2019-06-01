@@ -30,7 +30,7 @@ class JetsonLiveObjectDetection():
             classId = int(classes[i])
             if score > 0.5:
                 detections.append(self.detector.labels[str(classId)])
-                if (not args.no-video):
+                if (not args.noVideo):
                     x = int(bbox[1] * cols)
                     y = int(bbox[0] * rows)
                     right = int(bbox[3] * cols)
@@ -40,7 +40,7 @@ class JetsonLiveObjectDetection():
                     cv2.putText(img, self.detector.labels[str(classId)], (x,y), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
 
         print ("Found objects: " + str(' '.join(detections)) + ".")
-        if (not args.no-video):
+        if (not args.noVideo):
             cv2.imshow('Jetson Live Detection', img)
 
     def start(self):
@@ -66,7 +66,7 @@ class JetsonLiveObjectDetection():
                 #TODO: Add runtime ros publishers
                 print("TODO")
 
-            print ("Debug: Running at: " + str(1.0/(time.time() - curr_time)) + " Hz.")
+            print ("Running at: " + str(1.0/(time.time() - curr_time)) + " Hz.")
 
             if cv2.waitKey(1) == ord('q'):
                 break
@@ -92,7 +92,7 @@ if __name__ == "__main__":
     parser.add_argument('-v', '--verbosity', action='store_true', help="set logging verbosity (doesn't work)")
     parser.add_argument('-d', '--debug', action='store_true', help='Runs only the network without ROS.')
     parser.add_argument('-c', '--camera', default='/dev/video0', help='/path/to/video, defaults to /dev/video0')
-    parser.add_argument('--no-video', action='store_true', help='Will not display live video feed, will still display in terminal.')
+    parser.add_argument('--noVideo', action='store_true', help='Will not display live video feed, will still display in terminal.')
     
     args = parser.parse_args()
 
