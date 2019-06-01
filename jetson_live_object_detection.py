@@ -12,7 +12,7 @@ from src.object_detector import ObjectDetection
 
 """ Jetson Live Object Detector """
 class JetsonLiveObjectDetection():
-    def __init__(self, model, camera, debug=False, thresh=0.4 fps = 10.):
+    def __init__(self, model, camera, debug=False, thresh=0.4, fps = 10.):
         self.debug = debug
         self.camera = cv2.VideoCapture(camera)
         self.model = model
