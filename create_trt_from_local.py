@@ -11,7 +11,7 @@ parser.add_argument('-m', '--model', help='Name of the directory containing your
 args = parser.parse_args()
 
 if (args.model is None):
-    print("Please provide a -m flag followerd by the name of your directory in the /data folder that contains the frozen graph.")
+    print("Please provide a -m flag followerd by the name of your directory in the /data folder that contains the frozen graph. EX: -m my_retrained_network")
     exit()
 
 config_path = './data/' + args.model + '/pipeline.config'

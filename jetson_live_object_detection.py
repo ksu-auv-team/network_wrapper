@@ -12,11 +12,11 @@ from src.object_detector import ObjectDetection
 
 """ Jetson Live Object Detector """
 class JetsonLiveObjectDetection():
-    def __init__(self, model, camera, debug=False, thresh=0.4, fps = 10.):
+    def __init__(self, model, camera, debug=False, thresh=0.4, fps = 10.0):
         self.debug = debug
         self.camera = cv2.VideoCapture(camera)
         self.model = model
-        self.rate = float(1. / fps)
+        self.rate = float(1.0 / fps)
         self.detector = ObjectDetection(self.model, label_map=args.label)
         self.thresh = float(thresh)
 
@@ -88,7 +88,6 @@ class JetsonLiveObjectDetection():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="This script runs inference on a trained object detection network")
-    parser.add_argument('-t', '--training_set', help="specify set of targets to use (doesn't work)")
     parser.add_argument('-n', '--network', default="ssd_mobilenet_v1_coco", help="set name of neural network graph to use")
     parser.add_argument('-v', '--verbosity', action='store_true', help="set logging verbosity (doesn't work)")
     parser.add_argument('-d', '--debug', action='store_true', help='Runs only the network without ROS. (doesn\'t work)')
