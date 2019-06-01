@@ -12,12 +12,13 @@ from src.object_detector import ObjectDetection
 
 """ Jetson Live Object Detector """
 class JetsonLiveObjectDetection():
-    def __init__(self, model, camera, debug=False, fps = 10.):
+    def __init__(self, model, camera, debug=False, thresh=0.4 fps = 10.):
         self.debug = debug
         self.camera = cv2.VideoCapture(camera)
         self.model = model
         self.rate = float(1. / fps)
         self.detector = ObjectDetection('./data/' + self.model)
+        self.thresh = thresh
 
     def _visualizeDetections(self, img, scores, boxes, classes, num_detections):
         cols = img.shape[1]
@@ -28,7 +29,7 @@ class JetsonLiveObjectDetection():
             bbox = [float(p) for p in boxes[i]]
             score = float(scores[i])
             classId = int(classes[i])
-            if score > 0.5:
+            if score > self.thresh:
                 detections.append(self.detector.labels[str(classId)])
                 if (not args.noVideo):
                     x = int(bbox[1] * cols)
@@ -37,7 +38,7 @@ class JetsonLiveObjectDetection():
                     bottom = int(bbox[2] * rows)
                     thickness = int(4 * score)
                     cv2.rectangle(img, (x, y), (right, bottom), (125,255, 21), thickness=thickness)
-                    cv2.putText(img, self.detector.labels[str(classId)], (x,y), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
+                    cv2.putText(img, self.detector.labels[str(classId)] + ': ' str(score), (x,y), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
 
         print ("Found objects: " + str(' '.join(detections)) + ".")
         if (not args.noVideo):
@@ -92,11 +93,12 @@ if __name__ == "__main__":
     parser.add_argument('-v', '--verbosity', action='store_true', help="set logging verbosity (doesn't work)")
     parser.add_argument('-d', '--debug', action='store_true', help='Runs only the network without ROS.')
     parser.add_argument('-c', '--camera', default='/dev/video0', help='/path/to/video, defaults to /dev/video0')
+    parser.add_argument('--thresh', default=0.4, help='Override the default detection threshold. Default = 0.4')
     parser.add_argument('--noVideo', action='store_true', help='Will not display live video feed, will still display in terminal.')
     
     args = parser.parse_args()
 
-    live_detection = JetsonLiveObjectDetection(model=args.network, camera=args.camera, debug=args.debug, fps=10.0)
+    live_detection = JetsonLiveObjectDetection(model=args.network, camera=args.camera, debug=args.debug, thresh=args.thresh fps=10.0)
     live_detection.start()
     
 
