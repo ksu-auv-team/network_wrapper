@@ -52,6 +52,7 @@ class JetsonLiveObjectDetection():
             exit(-1)
         elif not self.debug:
             #TODO: Add ROS setup stuff here
+            print("TODO")
     
         while True:
             curr_time = time.time()
