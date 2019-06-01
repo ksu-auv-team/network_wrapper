@@ -1,17 +1,11 @@
 # jetson_nano_detection_and_tracking
 Jetson Nano ML install scripts, automated optimization of robotics detection models, and filter-based tracking of detections
 
-<a href="https://www.buymeacoffee.com/stevemacenski" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
-
-<p align="center">
-  <img width="300" height="300" src="gif/jetson_gif.gif">
-</p>
-
 ## Motivation
 
 Installing and setting up the new Nvidia Jetson Nano was surprisingly time consuming and unintuitive. From protobuf version conflicts, to Tensorflow versions, OpenCV recompiling with GPU, models running, models optimized, and general chaos in the ranks.
 
-This repository is my set of install tools to get the Nano up and running with a convincing and scalable demo for robot-centric uses. In particular, using detection and semantic segmentation models capable at running in real-time on a robot for $100. By convincing, I mean not using Nvidia's 2-day startup model you just compile and have magically working without having control. This gives you full control of which model to run and when. 
+This repository is KSU-AUV's set of install tools to get the Nano up and running with a convincing and scalable demo for robot-centric uses. In particular, using detection and semantic segmentation models capable at running in real-time on a robot for $100. This gives you full control of which model to run and when. 
 
 In the repository, you'll find a few key things:
 
@@ -23,17 +17,9 @@ This can be accomplished via `./install.sh` run in the root of this repository, 
 
 ### Download of pretrained models for real-time detection 
 
-Scripts to automatically download pretrained Tensorflow inference graphs and checkpoints, then optimize with TensorRT (which I found as a critical must-have to even *run* on the Nano).
+Scripts to automatically download pretrained Tensorflow inference graphs and checkpoints, then optimize with TensorRT (which was found as a critical must-have to even *run* on the Nano).
 
-Also there's nothing here that prohibits you from using your own Tensorflow model and then using the same scripts to optimize it with TensorRT and then deploy as described below. I have retrained a model from the zoo and followed these same instructions with equal success (I really needed that additional glass of beer class for... reasons).
-
-### Execution of live detection with an attached MIPI-based camera
-
-This will run the argus streamer for a MIPI camera compatible with the Jetson Nano. There are a number out there available, I happen to use the Raspberry Pi v2.1 camera simply because I had it around from another project and also because its shockingly high resolution for a $20 toy. 
-
-### Filter-based tracking of detections
-
-This uses a constant velocity Kalman Filter to track detections in the image frame and report stabilized detections based on the centroid. This is to handle 2 things. The first is to deal with irregular detections so that a few missing frames doesn't make an upstream application think a person disppeared out of thin air for 57 ms. Secondarily, it acts as smoother so if individual frames detect irraneous things (like an airplane rather than my ear) single frame detections aren't introduced into the system. For robotics applications it would be pretty bad if we saw an airplane in my living room. 
+TODO: Show how to use pre-trained up here for instant gratification
 
 ## Walk-through
 
@@ -54,4 +40,3 @@ Model options include:
 - ssd_mobilenet_v2_coco
 - ssd_inception_v2_coco
 
-There are other models available, but considering the use-case of this project is real-time detection in robotics, these are your main valid options. I make no warranty of other model uses.
