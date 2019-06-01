@@ -1,5 +1,6 @@
 import tensorflow as tf
 import numpy as np
+import argparse
 import cv2
 import tensorflow.contrib.tensorrt as trt
 import time
@@ -11,9 +12,9 @@ from src.object_detector import ObjectDetection
 
 """ Jetson Live Object Detector """
 class JetsonLiveObjectDetection():
-    def __init__(self, model, debug=False, fps = 10.):
+    def __init__(self, model, debug=False, camera, fps = 10.):
         self.debug = debug
-        self.camera = cv2.VideoCapture(0)
+        self.camera = cv2.VideoCapture(camera)
         self.model = model
         self.rate = float(1. / fps)
         self.detector = ObjectDetection('./data/' + self.model)
@@ -78,12 +79,16 @@ class JetsonLiveObjectDetection():
 
 
 if __name__ == "__main__":
-    debug = True
-    model = 'ssd_mobilenet_v1_coco_trt_graph.pb'
-    if len(sys.argv) > 2:
-        debug = sys.argv[2]
-        model = sys.argv[1]
-    live_detection = JetsonLiveObjectDetection(model=model, debug=debug)
+    parser = argparse.ArgumentParser(description="This script runs inference on a trained object detection network")
+    parser.add_argument('-t', '--training_set', help="specify set of targets to use (doesn't work)")
+    parser.add_argument('-n', '--network', default="ssd_mobilenet_v1_coco_trt_graph.pb", help="set name of neural network to use (default: %(default)s)")
+    parser.add_argument('-v', '--verbosity', action='store_true', help="set logging verbosity (doesn't work)")
+    parser.add_argument('-d', '--debug', action='store_true', help='Runs only the network without ROS.')
+    parser.add_argument('-c', '--camera', default='/dev/video0', help='/path/to/video, defaults to /dev/video0')
+    
+    args = parser.parse_args()
+
+    live_detection = JetsonLiveObjectDetection(model=args.network, debug=args.debug, camera=args.camera)
     live_detection.start()
     
 
