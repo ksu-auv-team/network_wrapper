@@ -29,17 +29,17 @@ class JetsonLiveObjectDetection():
             score = float(scores[i])
             classId = int(classes[i])
             if score > 0.5:
-                x = int(bbox[1] * cols)
-                y = int(bbox[0] * rows)
-                right = int(bbox[3] * cols)
-                bottom = int(bbox[2] * rows)
-                thickness = int(4 * score)
                 detections.append(self.detector.labels[str(classId)])
                 if (not args.no-video):
+                    x = int(bbox[1] * cols)
+                    y = int(bbox[0] * rows)
+                    right = int(bbox[3] * cols)
+                    bottom = int(bbox[2] * rows)
+                    thickness = int(4 * score)
                     cv2.rectangle(img, (x, y), (right, bottom), (125,255, 21), thickness=thickness)
                     cv2.putText(img, self.detector.labels[str(classId)], (x,y), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
 
-        print ("Debug: Found objects: " + str(' '.join(detections)) + ".")
+        print ("Found objects: " + str(' '.join(detections)) + ".")
         if (not args.no-video):
             cv2.imshow('Jetson Live Detection', img)
 
@@ -50,8 +50,8 @@ class JetsonLiveObjectDetection():
         if not self.camera.isOpened():
             print ("Camera has failed to open")
             exit(-1)
-        elif self.debug:
-            cv2.namedWindow("Jetson Live Detection", cv2.WINDOW_AUTOSIZE)
+        elif not self.debug:
+            #TODO: Add ROS setup stuff here
     
         while True:
             curr_time = time.time()
@@ -59,9 +59,12 @@ class JetsonLiveObjectDetection():
             ret, img = self.camera.read()
             scores, boxes, classes, num_detections = self.detector.detect(img)
 
+            self._visualizeDetections(img, scores, boxes, classes, num_detections)
+            
             if not self.debug:
-                self._visualizeDetections(img, scores, boxes, classes, num_detections)
-                print ("Debug: Running at: " + str(1.0/(time.time() - curr_time)) + " Hz.")
+                #TODO: Add runtime ros publishers
+
+            print ("Debug: Running at: " + str(1.0/(time.time() - curr_time)) + " Hz.")
 
             if cv2.waitKey(1) == ord('q'):
                 break
