@@ -34,13 +34,14 @@ class JetsonLiveObjectDetection():
                 right = int(bbox[3] * cols)
                 bottom = int(bbox[2] * rows)
                 thickness = int(4 * score)
-                cv2.rectangle(img, (x, y), (right, bottom), (125,255, 21), thickness=thickness)
-                cv2.putText(img, self.detector.labels[str(classId)], (x,y), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
                 detections.append(self.detector.labels[str(classId)])
+                if (not args.no-video):
+                    cv2.rectangle(img, (x, y), (right, bottom), (125,255, 21), thickness=thickness)
+                    cv2.putText(img, self.detector.labels[str(classId)], (x,y), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
 
         print ("Debug: Found objects: " + str(' '.join(detections)) + ".")
-
-        cv2.imshow('Jetson Live Detection', img)
+        if (not args.no-video):
+            cv2.imshow('Jetson Live Detection', img)
 
     def start(self):
         print ("Starting Live object detection, may take a few minutes to initialize...")
@@ -58,7 +59,7 @@ class JetsonLiveObjectDetection():
             ret, img = self.camera.read()
             scores, boxes, classes, num_detections = self.detector.detect(img)
 
-            if self.debug:
+            if not self.debug:
                 self._visualizeDetections(img, scores, boxes, classes, num_detections)
                 print ("Debug: Running at: " + str(1.0/(time.time() - curr_time)) + " Hz.")
 
@@ -86,6 +87,7 @@ if __name__ == "__main__":
     parser.add_argument('-v', '--verbosity', action='store_true', help="set logging verbosity (doesn't work)")
     parser.add_argument('-d', '--debug', action='store_true', help='Runs only the network without ROS.')
     parser.add_argument('-c', '--camera', default='/dev/video0', help='/path/to/video, defaults to /dev/video0')
+    parser.add_argument('--no-video', action='store_true', help='Will not display live video feed, will still display in terminal.')
     
     args = parser.parse_args()
 
