@@ -11,10 +11,10 @@ parser.add_argument('-m', '--model', help='Name of the directory containing your
 args = parser.parse_args()
 
 if (args.model is None):
-    print("Please provide the name of your directory in the /data folder that contains the frozen graph.")
+    print("Please provide a -m flag followerd by the name of your directory in the /data folder that contains the frozen graph.")
     exit()
 
-config_path = './data' + args.model + '/pipeline.config'
+config_path = './data/' + args.model + '/pipeline.config'
 checkpoint_path = './data/' + args.model + '/model.ckpt'
 
 print ("Building detection graph from model " + args.model + "...")
