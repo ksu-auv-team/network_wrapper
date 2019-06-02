@@ -1,5 +1,5 @@
-# jetson_nano_inference
-Jetson Nano ML install scripts, automated optimization of robotics detection models, and filter-based tracking of detections
+# Jetson_Nano_Inference
+Jetson Nano ML install scripts, automated optimization of robotics detection models, and easy to use debugging flags
 
 ## Motivation
 
