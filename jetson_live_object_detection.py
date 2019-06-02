@@ -14,7 +14,10 @@ from src.object_detector import ObjectDetection
 class JetsonLiveObjectDetection():
     def __init__(self, model, camera, debug=False, thresh=0.4, fps = 10.0):
         self.debug = debug
-        self.camera = cv2.VideoCapture(camera)
+        if args.test is not None:
+            self.camera = cv2.VideoCapture(args.test)    
+        else:    
+            self.camera = cv2.VideoCapture(camera)
         self.model = model
         self.rate = float(1.0 / fps)
         self.detector = ObjectDetection(self.model, label_map=args.label)
@@ -48,6 +51,25 @@ class JetsonLiveObjectDetection():
         print ("Starting Live object detection, may take a few minutes to initialize...")
         self.detector.initializeSession()
 
+        # For static video/picture testing:
+        if args.test is not None:
+            fourcc = cv2.VideoWriter_fourcc(*'XVID')
+            names = args.test.split('.')
+            out = cv2.VideoWriter(names[0] + '_output.' + names[1], fourcc, 30.0, (640,480))
+            args.noVideo = True
+            while(self.camera.isOpened()):
+                ret, img = self.camera.read()
+                scores, boxes, classes, num_detections = self.detector.detect(img)
+                self._visualizeDetections(img, scores, boxes, classes, num_detections)
+                out.write(img)
+
+            out.release()
+            self.camera.release()
+            self.detector.__del__()
+            print("Output File written to " names[0] + "_output." + names[1])
+            exit()
+
+        # Health Checks:
         if not self.camera.isOpened():
             print ("Camera has failed to open")
             exit(-1)
@@ -55,6 +77,7 @@ class JetsonLiveObjectDetection():
             #TODO: Add ROS setup stuff here
             print("TODO")
     
+        # Main Programming Loop
         while True:
             curr_time = time.time()
 
@@ -93,6 +116,7 @@ if __name__ == "__main__":
     parser.add_argument('-d', '--debug', action='store_true', help='Runs only the network without ROS. (doesn\'t work)')
     parser.add_argument('-c', '--camera', default='/dev/video0', help='/path/to/video, defaults to /dev/video0')
     parser.add_argument('-l', '--label', default='label_map.pbtxt', help='Override the name of the label map in your model directory. Defaults to label_map.pbtxt')
+    parser.add_argument('-t', '--test', help='/path/to/test/video/or/picture This is used if you want to test your network on a static video or picture. It will append \'_output\' to your file before saving it.')
     parser.add_argument('--thresh', default=0.4, help='Override the default detection threshold. Default = 0.4')
     parser.add_argument('--noVideo', action='store_true', help='Will not display live video feed, will still display in terminal.')
     
