@@ -84,6 +84,13 @@ Now, let's say you wanted to do all the previous, and also wanted to change the 
 python3 jetson_live_object_detection.py -m example_layout -c /dev/video2 -d --thresh 0.7
 ```
 
+If you don't have a webcam, there are both the --testVideo and --testPicture for using static testing data.    
+These output a file that is the same as your test file appended with \'_output\'
+```
+python3 jetson_live_object_detection.py -m example_layout --testVideo example_video.avi # or:
+python3 jetson_live_object_detection.py -m example_layout --testPicture example_picture.jpeg
+```
+
 you can string together as many (or as few) of these commands as you want, and you can see a full list of commands with --help
 
 
