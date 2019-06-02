@@ -63,6 +63,11 @@ class JetsonLiveObjectDetection():
                     scores, boxes, classes, num_detections = self.detector.detect(img)
                     self._visualizeDetections(img, scores, boxes, classes, num_detections)
                     out.write(img)
+                    cv2.imshow(names[0],img)
+                    if cv2.waitKey(1) & 0xFF == ord('q'):
+                        break
+                else:
+                    break
 
             out.release()
             self.camera.release()
