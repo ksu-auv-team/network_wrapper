@@ -14,6 +14,8 @@ class ObjectDetection():
 
     def _getLabels(self, label_map):
         labels = {}
+        name = ""
+        id_num = ""
         with open('./data/' + self.detection_model + '/' + label_map)  as fh:
             for line in fh:
                 if ("id:" in line):
