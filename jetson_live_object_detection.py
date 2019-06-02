@@ -14,8 +14,8 @@ from src.object_detector import ObjectDetection
 class JetsonLiveObjectDetection():
     def __init__(self, model, camera, debug=False, thresh=0.4, fps = 10.0):
         self.debug = debug
-        if args.test is not None:
-            self.camera = cv2.VideoCapture(args.test)    
+        if test_video_picture is not None:
+            self.camera = cv2.VideoCapture(test_video_picture)    
         else:    
             self.camera = cv2.VideoCapture(camera)
         self.model = model
@@ -44,7 +44,7 @@ class JetsonLiveObjectDetection():
                     cv2.putText(img, self.detector.labels[str(classId)] + ': ' + str(round(score,3)), (x,y), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
 
         print ("Found objects: " + str(' '.join(detections)) + ".")
-        if (not args.noVideo and args.test is None):
+        if (not args.noVideo and test_video_picture is None):
             cv2.imshow('Jetson Live Detection', img)
 
         return img
@@ -54,23 +54,27 @@ class JetsonLiveObjectDetection():
         self.detector.initializeSession()
 
         # For static video/picture testing:
-        if args.test is not None:
+        if test_video_picture is not None:
             fourcc = cv2.VideoWriter_fourcc(*'XVID')
-            names = args.test.split('.')
-            out = cv2.VideoWriter(names[0] + '_output.' + names[1], fourcc, 20.0, (640,480))
+            names = test_video_picture.split('.')
+            if args.testVideo is not None:
+                out = cv2.VideoWriter(names[0] + '_output.' + names[1], fourcc, 20.0, (640,480))
             while(self.camera.isOpened()):
                 ret, img = self.camera.read()
                 if ret:
                     scores, boxes, classes, num_detections = self.detector.detect(img)
                     img = self._visualizeDetections(img, scores, boxes, classes, num_detections)
-                    out.write(img)
-                    cv2.imshow(names[0],img)
-                    if cv2.waitKey(1) & 0xFF == ord('q'):
-                        break
+                    if args.testVideo is not None:
+                        out.write(img)
+                        cv2.imshow(names[0],img)
+                        if cv2.waitKey(1) & 0xFF == ord('q'):
+                            break
+                    elif args.testPicture is not None:
+                        cv2.imwrite(names[0] + '_output.' + names[1], img)
                 else:
                     break
-
-            out.release()
+            if args.testVideo is not None:
+                out.release()
             self.camera.release()
             self.detector.__del__()
             print("Output File written to " + names[0] + "_output." + names[1])
@@ -123,11 +127,21 @@ if __name__ == "__main__":
     parser.add_argument('-d', '--debug', action='store_true', help='Runs only the network without ROS. (doesn\'t work)')
     parser.add_argument('-c', '--camera', default='/dev/video0', help='/path/to/video, defaults to /dev/video0')
     parser.add_argument('-l', '--label', default='label_map.pbtxt', help='Override the name of the label map in your model directory. Defaults to label_map.pbtxt')
-    parser.add_argument('-t', '--test', help='/path/to/test/video/or/picture This is used if you want to test your network on a static video or picture. It will append \'_output\' to your file before saving it.')
+    parser.add_argument('--testVideo', help='/path/to/test/video This is used if you want to test your network on a static video. It will append \'_output\' to your file before saving it.')
+    parser.add_argument('--testPicture', help='/path/to/test/picture This is used if you want to test your network on a static picture. It will append \'_output\' to your file before saving it.')
     parser.add_argument('--thresh', default=0.4, help='Override the default detection threshold. Default = 0.4')
     parser.add_argument('--noVideo', action='store_true', help='Will not display live video feed, will still display in terminal.')
     
     args = parser.parse_args()
+
+    test_video_picture = None
+    if args.testVideo is not None and args.testPicture is not None:
+        print("Please don't use --testVideo and --testPicture at the same time.")
+        exit()
+    elif args.testVideo is not None:
+        test_video_picture = args.testVideo
+    elif args.testPicture is not None:
+        test_video_picture = args.testPicture
 
     live_detection = JetsonLiveObjectDetection(model=args.model, camera=args.camera, debug=args.debug, thresh=args.thresh, fps=10.0)
     live_detection.start()
