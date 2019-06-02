@@ -44,7 +44,7 @@ class JetsonLiveObjectDetection():
                     cv2.putText(img, self.detector.labels[str(classId)] + ': ' + str(round(score,3)), (x,y), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
 
         print ("Found objects: " + str(' '.join(detections)) + ".")
-        if (not args.noVideo):
+        if (not args.noVideo and args.test is None):
             cv2.imshow('Jetson Live Detection', img)
 
         return img
@@ -57,8 +57,7 @@ class JetsonLiveObjectDetection():
         if args.test is not None:
             fourcc = cv2.VideoWriter_fourcc(*'XVID')
             names = args.test.split('.')
-            out = cv2.VideoWriter(names[0] + '_output.' + names[1], fourcc, 30.0, (640,480))
-            args.noVideo = True
+            out = cv2.VideoWriter(names[0] + '_output.' + names[1], fourcc, 20.0, (640,480))
             while(self.camera.isOpened()):
                 ret, img = self.camera.read()
                 if ret:
