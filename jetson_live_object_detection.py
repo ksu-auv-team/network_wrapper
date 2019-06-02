@@ -66,7 +66,7 @@ class JetsonLiveObjectDetection():
             out.release()
             self.camera.release()
             self.detector.__del__()
-            print("Output File written to " names[0] + "_output." + names[1])
+            print("Output File written to " + names[0] + "_output." + names[1])
             exit()
 
         # Health Checks:
