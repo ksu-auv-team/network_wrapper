@@ -88,7 +88,7 @@ class JetsonLiveObjectDetection():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="This script runs inference on a trained object detection network")
-    parser.add_argument('-n', '--network', default="ssd_mobilenet_v1_coco", help="set name of neural network graph to use")
+    parser.add_argument('-m', '--model', default="ssd_mobilenet_v1_coco", help="set name of neural network model to use")
     parser.add_argument('-v', '--verbosity', action='store_true', help="set logging verbosity (doesn't work)")
     parser.add_argument('-d', '--debug', action='store_true', help='Runs only the network without ROS. (doesn\'t work)')
     parser.add_argument('-c', '--camera', default='/dev/video0', help='/path/to/video, defaults to /dev/video0')
@@ -98,7 +98,7 @@ if __name__ == "__main__":
     
     args = parser.parse_args()
 
-    live_detection = JetsonLiveObjectDetection(model=args.network, camera=args.camera, debug=args.debug, thresh=args.thresh, fps=10.0)
+    live_detection = JetsonLiveObjectDetection(model=args.model, camera=args.camera, debug=args.debug, thresh=args.thresh, fps=10.0)
     live_detection.start()
     
 
