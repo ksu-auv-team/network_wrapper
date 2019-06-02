@@ -59,9 +59,10 @@ class JetsonLiveObjectDetection():
             args.noVideo = True
             while(self.camera.isOpened()):
                 ret, img = self.camera.read()
-                scores, boxes, classes, num_detections = self.detector.detect(img)
-                self._visualizeDetections(img, scores, boxes, classes, num_detections)
-                out.write(img)
+                if ret:
+                    scores, boxes, classes, num_detections = self.detector.detect(img)
+                    self._visualizeDetections(img, scores, boxes, classes, num_detections)
+                    out.write(img)
 
             out.release()
             self.camera.release()
