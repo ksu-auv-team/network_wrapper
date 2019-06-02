@@ -47,6 +47,8 @@ class JetsonLiveObjectDetection():
         if (not args.noVideo):
             cv2.imshow('Jetson Live Detection', img)
 
+        return img
+
     def start(self):
         print ("Starting Live object detection, may take a few minutes to initialize...")
         self.detector.initializeSession()
@@ -61,7 +63,7 @@ class JetsonLiveObjectDetection():
                 ret, img = self.camera.read()
                 if ret:
                     scores, boxes, classes, num_detections = self.detector.detect(img)
-                    self._visualizeDetections(img, scores, boxes, classes, num_detections)
+                    img = self._visualizeDetections(img, scores, boxes, classes, num_detections)
                     out.write(img)
                     cv2.imshow(names[0],img)
                     if cv2.waitKey(1) & 0xFF == ord('q'):
