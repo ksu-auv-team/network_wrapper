@@ -1,2 +1,14 @@
+# Compiled python:
 *.pyc
+
+# Swap files:
+*.swp
+
+# Nvidia's tf_trt_models repo gets downloaded on setup
 tf_trt_models/
+
+# Ignore everything that get's downloaded, execpt for example things:
+data/*
+!data/coco_label_map.pbtxt
+!data/example_layout/
+
