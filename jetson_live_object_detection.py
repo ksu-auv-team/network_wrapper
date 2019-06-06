@@ -12,7 +12,6 @@ from src.object_detector import ObjectDetection
 
 """ Jetson Live Object Detector """
 class JetsonLiveObjectDetection():
-    # def __init__(self, model, camera, debug=False, thresh=0.4, fps = 10.0):
     def __init__(self, model, camera, debug=False, thresh=0.4):
         self.debug = debug
         if test_video_picture is not None:
@@ -20,7 +19,6 @@ class JetsonLiveObjectDetection():
         else:    
             self.camera = cv2.VideoCapture(camera)
         self.model = model
-        # self.rate = float(1.0 / fps)
         self.detector = ObjectDetection(self.model, label_map=args.label)
         self.thresh = float(thresh)
 
@@ -107,12 +105,6 @@ class JetsonLiveObjectDetection():
             if cv2.waitKey(1) == ord('q'):
                 break
 
-            # # throttle to rate
-            # capture_duration = time.time() - curr_time
-            # sleep_time = self.rate - capture_duration
-            # if sleep_time > 0:
-            #     time.sleep(sleep_time)
-        
         cv2.destroyAllWindows()
         self.camera.release()
         self.detector.__del__()
@@ -144,7 +136,6 @@ if __name__ == "__main__":
     elif args.testPicture is not None:
         test_video_picture = args.testPicture
 
-    # live_detection = JetsonLiveObjectDetection(model=args.model, camera=args.camera, debug=args.debug, thresh=args.thresh, fps=10.0)
     live_detection = JetsonLiveObjectDetection(model=args.model, camera=args.camera, debug=args.debug, thresh=args.thresh)
     live_detection.start()
     
