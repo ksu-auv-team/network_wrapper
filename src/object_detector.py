@@ -4,19 +4,21 @@ import cv2
 import tensorflow.contrib.tensorrt as trt
 import time
 import sys
+import os
 
 """ TensorFlow detection using TRT optimized graph"""
 class ObjectDetection():
     def __init__(self, detection_model, label_map='label_map.pbtxt'):
+        self.script_directory = os.path.dirname(os.path.realpath(__file__)) + '/'
         self.detection_model = detection_model
-        self.detection_model_path = './data/' + detection_model + '/' + detection_model + '_trt_graph.pb'
+        self.detection_model_path = self.script_directory + '../data/' + detection_model + '/' + detection_model + '_trt_graph.pb'
         self.labels = self._getLabels(label_map)
 
     def _getLabels(self, label_map):
         labels = {}
         name = ""
         id_num = ""
-        with open('./data/' + self.detection_model + '/' + label_map)  as fh:
+        with open(self.script_directory + '../data/' + self.detection_model + '/' + label_map)  as fh:
             for line in fh:
                 if ("id:" in line):
                     label, id_num = line.strip().split(': ', 1)
