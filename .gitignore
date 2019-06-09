@@ -7,8 +7,13 @@
 # Nvidia's tf_trt_models repo gets downloaded on setup
 tf_trt_models/
 
-# Ignore everything that get's downloaded, execpt for example things:
+# Ignore everything that gets downloaded, execpt for example things:
 data/*
 !data/coco_label_map.pbtxt
 !data/example_layout/
 
+# Ignore everything that users add to the training repo that isin't for example purposes:
+training/*
+!training/README.md
+!training/scripts/*
+!training/example_training_layout/* 
