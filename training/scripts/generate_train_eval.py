@@ -26,26 +26,12 @@ if __name__ == "__main__":
         type=bool,
         default=True,
         help='Stratify by class instead of whole dataset (default True)')
-    parser.add_argument(
-        '-o',
-        metavar='output_dir',
-        type=str,
-        default=None,
-        help=
-        'Directory to output train and evaluation datasets (default input_csv directory)'
-    )
 
     args = parser.parse_args()
 
     if args.f < 0 or args.f > 1:
         raise ValueError('train_frac must be between 0 and 1')
-
-    # output_dir = input_csv directory is None
-    if args.o is None:
-        output_dir, _ = os.path.split(args.input_csv)
-    else:
-        output_dir = args.o
-
+    
     df = pd.read_csv(args.input_csv)
 
     # get 'class' column for stratification
@@ -56,8 +42,8 @@ if __name__ == "__main__":
 
     # output files have the same name of the input file, with some extra stuff appended
     new_csv_name = os.path.splitext(args.input_csv)[0]
-    train_csv_path = os.path.join(output_dir, new_csv_name + '_train.csv')
-    eval_csv_path = os.path.join(output_dir, new_csv_name + '_eval.csv')
+    train_csv_path = new_csv_name + '_train.csv'
+    eval_csv_path = new_csv_name + '_eval.csv'
 
     train_df.to_csv(train_csv_path, index=False)
     validation_df.to_csv(eval_csv_path, index=False)
