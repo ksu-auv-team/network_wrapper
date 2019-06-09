@@ -39,7 +39,7 @@ For your convience, I will show you an example for how the outputs of the `examp
 ```bash
 python3 generate_csv.py xml ../example_training_layout/annotations ../example_training_layout/output_files/test_csv.csv
 python3 generate_pbtxt.py csv ../example_training_layout/output_files/test_csv.csv ../example_training_layout/output_files/label_map.pbtxt
-python3 generate_train_eval.py ../example_training_layout/output_files/test_csv.csv ../example_training_layout/output_files/
+python3 generate_train_eval.py ../example_training_layout/output_files/test_csv.csv 
 python3 generate_tfrecord.py ../example_training_layout/output_files/test_csv_train.csv ../example_training_layout/output_files/label_map.pbtxt ../example_training_layout/images/ ../example_training_layout/output_files/example_train.record
 python3 generate_tfrecord.py ../example_training_layout/output_files/test_csv_eval.csv ../example_training_layout/output_files/label_map.pbtxt ../example_training_layout/images/ ../example_training_layout/output_files/example_eval.record
 ```
