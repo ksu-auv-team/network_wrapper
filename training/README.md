@@ -4,6 +4,13 @@ This is a small example to describe what the process looks like for training a n
 ### Install Dependencies
 To start training, you need to make sure your evironment and versions are correct. My first suggestion, is to try the install.sh script to install all the major dependencies. It will also download the `tf_trt_models/third_party/models` repo, which is needed for training and freezing graphs. If that fails or you're getting weird errors, try tensorflow's official [documentation](https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/installation.md). If you want, you may also try to use an [annacond environemnt](https://www.anaconda.com/tensorflow-in-anaconda/). They try to make standardized environments where all your dependencies are taken care of.
 
+### Make jpeg from MP4
+The following command will split your video up into jpegs. `-i` is the path to the video file. `-qscale:v` followed by a number from 2-31 this indicates quality. 2 being the best, 31 being the worst. `-r` is the number of images per second to output. Think of this as how many pictures you want. EX: if you have a 10 second video, a value of `-r 2.5` will output 10*2.5 = 25 pictures. The last argument is where the images should output to, and what the format is that they should look like. `%04d` means 4 decimal numbers where they are all zero.
+```bash
+ffmpeg -i input_video.MP4 -qscale:v 2 -r 2.5 output_directory/output_image_%04d.jpeg
+```
+This would output videos in the `output_directory` with the names `output_image_0001.jpeg`, `output_image_0002.jpeg`, and so on.
+
 ### Install Label Tool
 You can, in theory, use any labeling tool that outputs to PASCAL VOC format to train with, but I like to use this one called [LabelImg](https://github.com/tzutalin/labelImg). To download, do the following:
 ```bash
