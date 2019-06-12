@@ -15,5 +15,5 @@ data/*
 # Ignore everything that users add to the training repo that isin't for example purposes:
 training/*
 !training/README.md
-!training/scripts/*
-!training/example_training_layout/* 
+!training/scripts
+!training/example_training_layout
