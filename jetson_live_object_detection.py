@@ -83,9 +83,14 @@ class JetsonLiveObjectDetection():
         if not self.camera.isOpened():
             print ("Camera has failed to open")
             exit(-1)
-        elif not self.debug:
-            #TODO: Add ROS setup stuff here
-            print("TODO")
+        if not self.debug:
+            import cv_bridge
+            import rospy
+            from sensor_msgs.msg import Image
+            bridge = cv_bridge.CvBridge()
+            rospy.init_node('Network_Vision')
+            pub = rospy.Publisher('imgs', Image, queue_size=1)
+            #rate = rospy.Rate(2)
     
         # Main Programming Loop
         while True:
@@ -96,9 +101,10 @@ class JetsonLiveObjectDetection():
 
             self._visualizeDetections(img, scores, boxes, classes, num_detections)
             
-            if not self.debug:
-                #TODO: Add runtime ros publishers
-                print("TODO")
+            # Publish ros-bridged images
+            if not args.debug:
+                msg = bridge.cv2_to_imgmsg(img)
+                pub.publish(msg)
 
             print ("Running at: " + str(1.0/(time.time() - curr_time)) + " Hz.")
 
