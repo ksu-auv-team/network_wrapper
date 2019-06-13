@@ -33,14 +33,13 @@ class JetsonLiveObjectDetection():
             classId = int(classes[i])
             if score > self.thresh:
                 detections.append(self.detector.labels[str(classId)])
-                if (not args.noVideo):
-                    x = int(bbox[1] * cols)
-                    y = int(bbox[0] * rows)
-                    right = int(bbox[3] * cols)
-                    bottom = int(bbox[2] * rows)
-                    thickness = int(4 * score)
-                    cv2.rectangle(img, (x, y), (right, bottom), (125,255, 21), thickness=thickness)
-                    cv2.putText(img, self.detector.labels[str(classId)] + ': ' + str(round(score,3)), (x,y), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
+                x = int(bbox[1] * cols)
+                y = int(bbox[0] * rows)
+                right = int(bbox[3] * cols)
+                bottom = int(bbox[2] * rows)
+                thickness = int(4 * score)
+                cv2.rectangle(img, (x, y), (right, bottom), (125,255, 21), thickness=thickness)
+                cv2.putText(img, self.detector.labels[str(classId)] + ': ' + str(round(score,3)), (x,y), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
 
         print ("Found objects: " + str(' '.join(detections)) + ".")
         if (not args.noVideo and test_video_picture is None):
@@ -65,9 +64,10 @@ class JetsonLiveObjectDetection():
                     img = self._visualizeDetections(img, scores, boxes, classes, num_detections)
                     if args.testVideo is not None:
                         out.write(img)
-                        cv2.imshow(names[0],img)
-                        if cv2.waitKey(1) & 0xFF == ord('q'):
-                            break
+                        if(not args.noVideo):
+                            cv2.imshow(names[0],img)
+                            if cv2.waitKey(1) & 0xFF == ord('q'):
+                                break
                     elif args.testPicture is not None:
                         cv2.imwrite(names[0] + '_output.' + names[1], img)
                 else:
