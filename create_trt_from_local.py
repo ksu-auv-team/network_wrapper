@@ -7,6 +7,7 @@ from tf_trt_models.detection import download_detection_model, build_detection_gr
 parser = argparse.ArgumentParser(description="This script will create a trt optimized graph from a retrained network. In your retreined network folder, you should have: \
                                             frozen_inference_graph.pb, three model.ckpt.<something> files, the pipeline.config file you used, and your <label-map-name>.pbtxt")
 parser.add_argument('-m', '--model', help='Name of the directory containing your retrained network. You MUST put this in /data/ as that is where this script is looking for it.')
+parser.add_argument('-n', '--number', default=None, help='Model number appended to model.ckpt-')
 
 args = parser.parse_args()
 
@@ -16,6 +17,8 @@ if (args.model is None):
 
 config_path = './data/' + args.model + '/pipeline.config'
 checkpoint_path = './data/' + args.model + '/model.ckpt'
+if(args.number is not None):
+    checkpoint_path += '-' + args.number
 
 print ("Building detection graph from model " + args.model + "...")
 frozen_graph, input_names, output_names = build_detection_graph(
