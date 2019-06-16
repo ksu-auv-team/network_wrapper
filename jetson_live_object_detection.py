@@ -45,11 +45,43 @@ class JetsonLiveObjectDetection():
 
         return img, detections
 
+    def static_video(self):
+        if test_video_picture is not None:
+            fourcc = cv2.VideoWriter_fourcc('M','J','P','G')
+            names = test_video_picture.split('.')
+            if args.test_video is not None and not args.no_save_images:
+                out = cv2.VideoWriter(names[0] + '_output.' + names[1], fourcc, 30.0, (640,480))
+            while(self.camera.isOpened()):
+                ret, img = self.camera.read()
+                if args.test_video is not None:
+                    img = cv2.resize(img, (640,480))
+                if ret:
+                    scores, boxes, classes, num_detections = self.detector.detect(img)
+                    img, new_detections = self._visualizeDetections(img, scores, boxes, classes, num_detections)
+                    if (not args.no_video):
+                        cv2.imshow(names[0], img)
+                        if cv2.waitKey(1) & 0xFF == ord('q'):
+                            break
+                    if args.test_video is not None and not args.no_save_images:
+                        out.write(img)
+                    elif args.test_picture is not None:
+                        cv2.imwrite(names[0] + '_output.' + names[1], img)
+                    print ("Found objects: " + str(' '.join(new_detections)) + ".")
+                else:
+                    break
+            if args.test_video is not None and not args.no_save_images:
+                out.release()
+            self.camera.release()
+            self.detector.__del__()
+            if (not args.no_save_video):
+                print("Output File written to " + names[0] + "_output." + names[1])
+            exit()
+
     def start(self):
         img_counter = 0
         if (not args.no_save_images):
             script_directory = os.path.dirname(os.path.realpath(__file__)) + '/'
-            save_dir = script_directory + '../saved_video/{}/'.format(datetime.datetime.now())
+            save_dir = script_directory + 'saved_video/{}/'.format(datetime.datetime.now())
             os.mkdir(save_dir)
 
         print ("Starting Live object detection, may take a few minutes to initialize...")
@@ -57,31 +89,7 @@ class JetsonLiveObjectDetection():
 
         # For static video/picture testing:
         if test_video_picture is not None:
-            fourcc = cv2.VideoWriter_fourcc(*'XVID')
-            names = test_video_picture.split('.')
-            if args.test_video is not None:
-                out = cv2.VideoWriter(names[0] + '_output.' + names[1], fourcc, 20.0, (640,480))
-            while(self.camera.isOpened()):
-                ret, img = self.camera.read()
-                if ret:
-                    scores, boxes, classes, num_detections = self.detector.detect(img)
-                    img = self._visualizeDetections(img, scores, boxes, classes, num_detections)
-                    if args.test_video is not None:
-                        out.write(img)
-                        if(not args.no_video):
-                            cv2.imshow(names[0],img)
-                            if cv2.waitKey(1) & 0xFF == ord('q'):
-                                break
-                    elif args.test_picture is not None:
-                        cv2.imwrite(names[0] + '_output.' + names[1], img)
-                else:
-                    break
-            if args.test_video is not None:
-                out.release()
-            self.camera.release()
-            self.detector.__del__()
-            print("Output File written to " + names[0] + "_output." + names[1])
-            exit()
+           self.static_video() 
 
         # Health Checks:
         if not self.camera.isOpened():
@@ -110,7 +118,7 @@ class JetsonLiveObjectDetection():
             if (not args.no_video):
                 cv2.imshow('Jetson Live Detection', img)
             if ((img_counter % 3) == 0 and not args.no_save_images):
-                img_name = save_dir + "{}/opencv_frame_{}.jpg".format(save_dir, img_counter)
+                img_name = "{}opencv_frame_{}.jpg".format(save_dir, img_counter)
                 cv2.imwrite(img_name, img)
 
             img_counter += 1
