@@ -53,11 +53,11 @@ class JetsonLiveObjectDetection():
                 out = cv2.VideoWriter(names[0] + '_output.' + names[1], fourcc, 30.0, (640,480))
             while(self.camera.isOpened()):
                 ret, img = self.camera.read()
-                if args.test_video is not None:
-                    img = cv2.resize(img, (640,480))
                 if ret:
                     scores, boxes, classes, num_detections = self.detector.detect(img)
                     img, new_detections = self._visualizeDetections(img, scores, boxes, classes, num_detections)
+                    if args.test_video is not None:
+                        img = cv2.resize(img, (640,480))
                     if (not args.no_video):
                         cv2.imshow(names[0], img)
                         if cv2.waitKey(1) & 0xFF == ord('q'):
