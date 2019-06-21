@@ -73,7 +73,7 @@ class JetsonLiveObjectDetection():
                 out.release()
             self.camera.release()
             self.detector.__del__()
-            if (not args.no_save_video):
+            if (not args.no_save_images):
                 print("Output File written to " + names[0] + "_output." + names[1])
             exit()
 
@@ -81,7 +81,7 @@ class JetsonLiveObjectDetection():
         img_counter = 0
         if (not args.no_save_images):
             script_directory = os.path.dirname(os.path.realpath(__file__)) + '/'
-            save_dir = script_directory + 'saved_video/{}/'.format(datetime.datetime.now())
+            save_dir = script_directory + 'saved_video/{}_{}/'.format(self.model,datetime.datetime.now())
             os.mkdir(save_dir)
 
         print ("Starting Live object detection, may take a few minutes to initialize...")
