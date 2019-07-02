@@ -5,9 +5,7 @@ import cv2
 import tensorflow.contrib.tensorrt as trt
 import time
 import sys
-import gi
-gi.require_version('Gst', '1.0')
-from gi.repository import Gst
+import signal
 from src.object_detector import ObjectDetection
 import os
 import datetime
@@ -23,6 +21,12 @@ class JetsonLiveObjectDetection():
         self.model = model
         self.detector = ObjectDetection(self.model, label_map=args.label)
         self.thresh = float(thresh)
+
+    def signal_handler(self, sig, frame):
+        cv2.destroyAllWindows()
+        self.camera.release()
+        self.detector.__del__()
+        sys.exit(0)
 
     def _visualizeDetections(self, img, scores, boxes, classes, num_detections):
         cols = img.shape[1]
@@ -102,7 +106,6 @@ class JetsonLiveObjectDetection():
             bridge = cv_bridge.CvBridge()
             rospy.init_node('Network_Vision')
             pub = rospy.Publisher('imgs', Image, queue_size=1)
-            #rate = rospy.Rate(2)
     
         # Main Programming Loop
         while True:
@@ -125,8 +128,8 @@ class JetsonLiveObjectDetection():
 
             # Publish ros-bridged images
             if not args.debug:
-                msg = bridge.cv2_to_imgmsg(img)
-                pub.publish(msg)
+                img_msg = bridge.cv2_to_imgmsg(img)
+                pub.publish(img_msg)
 
             print ("Running at: " + str(1.0/(time.time() - curr_time)) + " Hz.")
 
@@ -166,6 +169,10 @@ if __name__ == "__main__":
         test_video_picture = args.test_picture
 
     live_detection = JetsonLiveObjectDetection(model=args.model, camera=args.camera, debug=args.debug, thresh=args.thresh)
+
+    # captureing Ctrl+C
+    signal.signal(signal.SIGINT, live_detection.signal_handler)
+
     live_detection.start()
     
 
