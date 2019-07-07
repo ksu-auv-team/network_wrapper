@@ -10,6 +10,7 @@ from src.object_detector import ObjectDetection
 import os
 import datetime
 
+
 """ Jetson Live Object Detector """
 class JetsonLiveObjectDetection():
     def __init__(self, model, camera, debug=False, thresh=0.4):
@@ -103,9 +104,11 @@ class JetsonLiveObjectDetection():
             import cv_bridge
             import rospy
             from sensor_msgs.msg import Image
+            from submarine_msgs_srvs.msg import Detections
             bridge = cv_bridge.CvBridge()
             rospy.init_node('Network_Vision')
-            pub = rospy.Publisher('imgs', Image, queue_size=1)
+            img_pub = rospy.Publisher('imgs', Image, queue_size=1)
+            detections_pub = rospy.Publisher('ssd_output', Detections, queue_size=1)
     
         # Main Programming Loop
         while True:
@@ -129,7 +132,14 @@ class JetsonLiveObjectDetection():
             # Publish ros-bridged images
             if not args.debug:
                 img_msg = bridge.cv2_to_imgmsg(img)
-                pub.publish(img_msg)
+                img_pub.publish(img_msg)
+
+                detections_msg = Detections()
+                detections_msg.scores = scores
+                detections_msg.boxes = boxes.flatten()
+                detections_msg.classes = classes
+                detections_msg.detected = [num_detections]
+                detections_pub.publish(detections_msg)
 
             print ("Running at: " + str(1.0/(time.time() - curr_time)) + " Hz.")
 

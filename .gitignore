@@ -17,3 +17,8 @@ training/*
 !training/README.md
 !training/scripts
 !training/example_training_layout
+
+# Catkin Workspace Things:
+# Catkin_Workspace Things:
+catkin_ws/build
+catkin_ws/devel

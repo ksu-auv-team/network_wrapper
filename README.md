@@ -93,4 +93,12 @@ python3 jetson_live_object_detection.py -m example_layout --testPicture example_
 
 you can string together as many (or as few) of these commands as you want, and you can see a full list of commands with --help
 
+## Catkin_Ws
+```bash
+cd /path/to/jetson_nano_inference
+echo "source $(pwd)/catkin_ws/devel/setup.bash" >> ~/.bashrc
+cd catkin_ws
+catkin_make
+source ~/.bashrc
+```
 
