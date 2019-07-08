@@ -84,6 +84,9 @@ class JetsonLiveObjectDetection():
 
     def start(self):
         img_counter = 0
+        frame_counter = 0
+        fps = self.camera.get(cv2.CAP_PROP_FPS)
+
         if (not args.no_save_images):
             script_directory = os.path.dirname(os.path.realpath(__file__)) + '/'
             save_dir = script_directory + 'saved_video/{}_{}/'.format(self.model,datetime.datetime.now())
@@ -115,34 +118,38 @@ class JetsonLiveObjectDetection():
             curr_time = time.time()
 
             ret, img = self.camera.read()
-            scores, boxes, classes, num_detections = self.detector.detect(img)
-
-            new_detections = None
-            img, new_detections = self._visualizeDetections(img, scores, boxes, classes, num_detections)
+            if (frame_counter >= fps / args.rate):
+                frame_counter = 0
+                scores, boxes, classes, num_detections = self.detector.detect(img)
+                new_detections = None
+                img, new_detections = self._visualizeDetections(img, scores, boxes, classes, num_detections)
             
-            print ("Found objects: " + str(' '.join(new_detections)) + ".")
-            if (not args.no_video):
-                cv2.imshow('Jetson Live Detection', img)
-            if ((img_counter % 3) == 0 and not args.no_save_images):
-                img_name = "{}opencv_frame_{}.jpg".format(save_dir, img_counter)
-                cv2.imwrite(img_name, img)
+                print ("Found objects: " + str(' '.join(new_detections)) + ".")
+                if (not args.no_video):
+                    cv2.imshow('Jetson Live Detection', img)
+                if ((img_counter % 3) == 0 and not args.no_save_images):
+                    img_name = "{}opencv_frame_{}.jpg".format(save_dir, int(curr_time))
+                    cv2.imwrite(img_name, img)
+                    img_counter = 0
+                
+                img_counter += 1
 
-            img_counter += 1
+                # Publish ros-bridged images
+                if not args.debug:
+                    img_msg = bridge.cv2_to_imgmsg(img)
+                    img_pub.publish(img_msg)
 
-            # Publish ros-bridged images
-            if not args.debug:
-                img_msg = bridge.cv2_to_imgmsg(img)
-                img_pub.publish(img_msg)
+                    detections_msg = Detections()
+                    detections_msg.scores = scores
+                    detections_msg.boxes = boxes.flatten()
+                    detections_msg.classes = classes
+                    detections_msg.detected = [num_detections]
+                    detections_pub.publish(detections_msg)
 
-                detections_msg = Detections()
-                detections_msg.scores = scores
-                detections_msg.boxes = boxes.flatten()
-                detections_msg.classes = classes
-                detections_msg.detected = [num_detections]
-                detections_pub.publish(detections_msg)
+                print ("Network running at: " + str(1.0/(time.time() - curr_time)) + " Hz.")
 
-            print ("Running at: " + str(1.0/(time.time() - curr_time)) + " Hz.")
-
+            frame_counter += 1
+            
             if cv2.waitKey(1) == ord('q'):
                 break
 
@@ -158,8 +165,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="This script runs inference on a trained object detection network")
     parser.add_argument('-m', '--model', default="ssd_mobilenet_v1_coco", help="set name of neural network model to use")
     parser.add_argument('-v', '--verbosity', action='store_true', help="set logging verbosity (doesn't work)")
-    parser.add_argument('-d', '--debug', action='store_true', help='Runs only the network without ROS. (doesn\'t work)')
+    parser.add_argument('-d', '--debug', action='store_true', help='Runs only the network without ROS.')
     parser.add_argument('-c', '--camera', default='/dev/video0', help='/path/to/video, defaults to /dev/video0')
+    parser.add_argument('-r', '--rate', type=int, default=-1, help='Specify the rate to run the neural network at, i.e. number of images to look at per second. Defaults to fastests possible.')
     parser.add_argument('-l', '--label', default='label_map.pbtxt', help='Override the name of the label map in your model directory. Defaults to label_map.pbtxt')
     parser.add_argument('--test-video', help='/path/to/test/video This is used if you want to test your network on a static video. It will append \'_output\' to your file before saving it.')
     parser.add_argument('--test-picture', help='/path/to/test/picture This is used if you want to test your network on a static picture. It will append \'_output\' to your file before saving it.')
