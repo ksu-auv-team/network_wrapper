@@ -102,3 +102,18 @@ catkin_make
 source ~/.bashrc
 ```
 
+## CV_Bridge Stuff
+First, delete the devel and build folder in catkin_ws
+```bash
+sudo pip install -U catkin_tools
+catkin config -DPYTHON_EXECUTABLE=/usr/bin/python3 -DPYTHON_INCLUDE_DIR=/usr/include/python3.5m -DPYTHON_LIBRARY=/usr/lib/x86_64-linux-gnu/libpython3.5m.so
+catkin config --install
+git clone https://github.com/ros-perception/vision_opencv.git src/vision_opencv
+apt-cache show ros-melodic-cv-bridge | grep Version
+cd src/vision_opencv/
+git checkout <version-from-before>
+cd ../../
+catkin build cv_bridge
+source install/setup.bash --extend
+```
+
