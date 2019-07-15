@@ -14,7 +14,7 @@ from submarine_msgs_srvs.msg import Detections
 
 """ Jetson Live Object Detector """
 class JetsonLiveObjectDetection():
-    def __init__(self, model, camera=None, debug=False, thresh=0.4):
+    def __init__(self, model, camera=None, debug=False, thresh=0.4, last_network_callback_time=0.0):
         self.debug = debug
         if test_video_picture is not None:
             self.camera = cv2.VideoCapture(test_video_picture)    
@@ -23,6 +23,7 @@ class JetsonLiveObjectDetection():
         self.model = model
         self.detector = ObjectDetection(self.model, label_map=args.label)
         self.thresh = float(thresh)
+        self.last_network_callback_time = last_network_callback_time
 
     def signal_handler(self, sig, frame):
         cv2.destroyAllWindows()
@@ -161,8 +162,7 @@ class JetsonLiveObjectDetection():
             rospy.spin()
 
     def run_network_node(self, msg):
-        global last_network_callback_time
-        if (time.time() - last_network_callback_time) <= args.rate:
+        if (time.time() - self.last_network_callback_time) <= args.rate:
             return
         bridge = cv_bridge.CvBridge()
         img = bridge.imgmsg_to_cv2(msg)
@@ -182,7 +182,7 @@ class JetsonLiveObjectDetection():
         detections_msg.detected = [num_detections]
         detections_pub.publish(detections_msg)
 
-        last_network_callback_time = time.time()
+        self.last_network_callback_time = time.time()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="This script runs inference on a trained object detection network")
@@ -200,9 +200,6 @@ if __name__ == "__main__":
     parser.add_argument('--no-ros', action='store_true', help='Will not subscribe or publish to any ros topics')
 
     args = parser.parse_args()
-
-    global last_network_callback_time
-    last_network_callback_time = time.time()
 
     if not args.no_ros:
         import cv_bridge
@@ -222,7 +219,7 @@ if __name__ == "__main__":
     elif args.test_picture is not None:
         test_video_picture = args.test_picture
 
-    live_detection = JetsonLiveObjectDetection(model=args.model, camera=args.camera, debug=args.debug, thresh=args.thresh)
+    live_detection = JetsonLiveObjectDetection(model=args.model, camera=args.camera, debug=args.debug, thresh=args.thresh, last_network_callback_time=time.time())
 
     # captureing Ctrl+C
     signal.signal(signal.SIGINT, live_detection.signal_handler)
