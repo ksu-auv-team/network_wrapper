@@ -66,7 +66,7 @@ class JetsonLiveObjectDetection():
                     img, new_detections = self._visualizeDetections(img, scores, boxes, classes, num_detections)
                     if args.test_video is not None:
                         img = cv2.resize(img, (640,480))
-                    if (not args.no_video):
+                    if (args.show_video):
                         cv2.imshow(names[0], img)
                         if cv2.waitKey(1) & 0xFF == ord('q'):
                             break
@@ -122,7 +122,7 @@ class JetsonLiveObjectDetection():
                     img, new_detections = self._visualizeDetections(img, scores, boxes, classes, num_detections)
             
                     print ("Found objects: " + str(' '.join(new_detections)) + ".")
-                    if (not args.no_video):
+                    if (args.show_video):
                         cv2.imshow('Jetson Live Detection', img)
                     if ((img_counter % 3) == 0 and not args.no_save_images):
                         img_name = "{}opencv_frame_{}.jpg".format(save_dir, int(curr_time))
@@ -195,7 +195,7 @@ if __name__ == "__main__":
     parser.add_argument('--test-video', help='/path/to/test/video This is used if you want to test your network on a static video. It will append \'_output\' to your file before saving it.')
     parser.add_argument('--test-picture', help='/path/to/test/picture This is used if you want to test your network on a static picture. It will append \'_output\' to your file before saving it.')
     parser.add_argument('--thresh', default=0.4, help='Override the default detection threshold. Default = 0.4')
-    parser.add_argument('--no-video', action='store_true', help='Will not display live video feed, will still display in terminal.')
+    parser.add_argument('--show-video', action='store_true', help='Will display live video feed on local machine.')
     parser.add_argument('--no-save-images', action='store_true', help='Will not record any video/pictures from the sub')
     parser.add_argument('--no-ros', action='store_true', help='Will not subscribe or publish to any ros topics')
 
