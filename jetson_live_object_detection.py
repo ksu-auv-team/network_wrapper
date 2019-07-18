@@ -26,6 +26,12 @@ class JetsonLiveObjectDetection():
         self.last_network_callback_time = last_network_callback_time
 
     def signal_handler(self, sig, frame):
+        ''' Handles interrupt signals from OS.
+
+        Args:
+            signal: signal received from system
+            frame: state capture for diagnostic porpises.
+        '''
         cv2.destroyAllWindows()
         if args.debug or test_video_picture is not None:
             self.camera.release()
@@ -33,6 +39,20 @@ class JetsonLiveObjectDetection():
         sys.exit(0)
 
     def _visualizeDetections(self, img, scores, boxes, classes, num_detections):
+        ''' Draws detections on images and returns a list of the detections name in string form 
+
+        Args:
+            img: OpenCV Mat, The current OpenCV Image
+            scores: Float List, List of confidence values 
+            boxes: 2D Float List, Bounding boxes for the objects
+            classes: Float List, List of the IDs for each detected object
+            num_detections: Float/Int, Number of detections found
+        
+        Returns:
+            img: OpenCV Mat, Newly drawn-on image
+            detections: String List, Actual names of object detected in a list
+        '''
+
         cols = img.shape[1]
         rows = img.shape[0]
         detections = []
@@ -54,6 +74,8 @@ class JetsonLiveObjectDetection():
         return img, detections
 
     def static_video(self):
+        ''' Run the object detection on recorded video or images
+        '''
         if test_video_picture is not None:
             fourcc = cv2.VideoWriter_fourcc('M','J','P','G')
             names = test_video_picture.split('.')
@@ -86,6 +108,8 @@ class JetsonLiveObjectDetection():
             exit()
 
     def start(self):
+        ''' Starts up the detector for static or live video.
+        '''
         img_counter = 0
         frame_counter = 0
 
@@ -162,6 +186,12 @@ class JetsonLiveObjectDetection():
             rospy.spin()
 
     def run_network_node(self, msg):
+        ''' Runs network node on the recevial of an image from ROS 
+
+        Args:
+            msg: ROS OpenCV Brige message, image to process on 
+        '''
+
         if (time.time() - self.last_network_callback_time) <= args.rate:
             return
         bridge = cv_bridge.CvBridge()
