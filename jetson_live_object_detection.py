@@ -182,7 +182,7 @@ class JetsonLiveObjectDetection():
 
         # Run the code as a ROS node, pulls images on a topic, published them out on antoher
         else:
-            rospy.Subscriber('raw_imgs', Image, self.run_network_node)
+            rospy.Subscriber('raw_imgs', Image, self.run_network_node, queue_size=1)
             rospy.spin()
 
     def run_network_node(self, msg):
