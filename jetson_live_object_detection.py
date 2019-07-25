@@ -20,6 +20,8 @@ class JetsonLiveObjectDetection():
             self.camera = cv2.VideoCapture(test_video_picture)    
         elif self.debug:    
             self.camera = cv2.VideoCapture(camera)
+            self.camera.set(3, args.width)
+            self.camera.set(4, args.height)
         self.model = model
         self.detector = ObjectDetection(self.model, label_map=args.label)
         self.thresh = float(thresh)
@@ -86,8 +88,6 @@ class JetsonLiveObjectDetection():
                 if ret:
                     scores, boxes, classes, num_detections = self.detector.detect(img)
                     img, new_detections = self._visualizeDetections(img, scores, boxes, classes, num_detections)
-                    if args.test_video is not None:
-                        img = cv2.resize(img, (640,480))
                     if (args.show_video):
                         cv2.imshow(names[0], img)
                         if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -220,6 +220,8 @@ if __name__ == "__main__":
     parser.add_argument('-v', '--verbosity', action='store_true', help="set logging verbosity (doesn't work)")
     parser.add_argument('-d', '--debug', action='store_true', help='Runs the network using a local camera, not from ROS, but will still publish to ROS topics.')
     parser.add_argument('-c', '--camera', default='/dev/video0', help='/path/to/video, defaults to /dev/video0')
+    parser.add_argument('--height', default=420, help='Set the video capture height for your camera in pixels')
+    parser.add_argument('--width', default=860, help='Set the video capture width for your camera in pixels')
     parser.add_argument('-r', '--rate', type=int, default=-1, help='Specify the rate to run the neural network at, i.e. number of images to look at per second. Defaults to fastests possible.')
     parser.add_argument('-l', '--label', default='label_map.pbtxt', help='Override the name of the label map in your model directory. Defaults to label_map.pbtxt')
     parser.add_argument('--test-video', help='/path/to/test/video This is used if you want to test your network on a static video. It will append \'_output\' to your file before saving it.')
