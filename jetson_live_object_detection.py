@@ -212,7 +212,7 @@ class JetsonLiveObjectDetection():
         scores, boxes, classes, num_detections = self.detector.detect(img)
         new_detections = None
         img, new_detections = self._visualizeDetections(img, scores, boxes, classes, num_detections)
-        print ("Found objects: " + str(' '.join(new_detections)) + ".")
+        print ("Found Front objects: " + str(' '.join(new_detections)) + ".")
 
         img_msg = bridge.cv2_to_imgmsg(img)
         front_img_pub.publish(img_msg)
@@ -245,7 +245,7 @@ class JetsonLiveObjectDetection():
         scores, boxes, classes, num_detections = self.detector.detect(img)
         new_detections = None
         img, new_detections = self._visualizeDetections(img, scores, boxes, classes, num_detections)
-        print ("Found objects: " + str(' '.join(new_detections)) + ".")
+        print ("Found Bottom objects: " + str(' '.join(new_detections)) + ".")
 
         img_msg = bridge.cv2_to_imgmsg(img)
         bottom_img_pub.publish(img_msg)
@@ -281,6 +281,8 @@ if __name__ == "__main__":
     parser.add_argument('--show-video', action='store_true', help='Will display live video feed on local machine.')
     parser.add_argument('--no-save-images', action='store_true', help='Will not record any video/pictures from the sub')
     parser.add_argument('--no-ros', action='store_true', help='Will not subscribe or publish to any ros topics')
+    parser.add_argument('--front-start-on', action='store_true', help='Will start with the front camera node running')
+    parser.add_argument('--bottom-start-on', action='store_true', help='Will start with the bottom camera node running')
 
     args = parser.parse_args()
 
@@ -288,7 +290,7 @@ if __name__ == "__main__":
         import cv_bridge
         import rospy
         from sensor_msgs.msg import Image
-        from std_msg.msg import Bool
+        from std_msgs.msg import Bool
         bridge = cv_bridge.CvBridge()
 
         rospy.init_node('Network_Vision')
@@ -309,6 +311,9 @@ if __name__ == "__main__":
         test_video_picture = args.test_picture
 
     live_detection = JetsonLiveObjectDetection(model=args.model, camera=args.camera, debug=args.debug, thresh=args.thresh, last_network_callback_time=time.time())
+
+    live_detection.run_network_front = args.front_start_on
+    live_detection.run_network_bottom = args.front_start_on
 
     # captureing Ctrl+C
     signal.signal(signal.SIGINT, live_detection.signal_handler)
