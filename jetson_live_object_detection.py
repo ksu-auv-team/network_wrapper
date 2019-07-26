@@ -27,6 +27,11 @@ class JetsonLiveObjectDetection():
         self.thresh = float(thresh)
         self.last_network_callback_time = last_network_callback_time
 
+        # Default to not running the network node on either camera, must push an enable/disable message from statemachine
+        # We do this so we can control what states the network is actually running in 
+        self.run_network_front = False
+        self.run_network_bottom = False
+
     def signal_handler(self, sig, frame):
         ''' Handles interrupt signals from OS.
 
@@ -184,6 +189,8 @@ class JetsonLiveObjectDetection():
         else:
             rospy.Subscriber('front_raw_imgs', Image, self.run_network_node_front, queue_size=1)
             rospy.Subscriber('bottom_raw_imgs', Image, self.run_network_node_bottom, queue_size=1)
+            rospy.Subscriber('enable_front_network', Bool, self.enable_front_callback)
+            rospy.Subscriber('enable_bottom_network', Bool, self.enable_bottom_callback)
             rospy.spin()
 
     def run_network_node_front(self, msg):
@@ -192,6 +199,10 @@ class JetsonLiveObjectDetection():
         Args:
             msg: ROS OpenCV Brige message, image to process on 
         '''
+        
+        # Disable the front camera check
+        if not self.run_network_front:
+            return
 
         if (time.time() - self.last_network_callback_time) <= args.rate:
             return
@@ -222,6 +233,10 @@ class JetsonLiveObjectDetection():
             msg: ROS OpenCV Brige message, image to process on 
         '''
 
+        # Disable the bottom camera check
+        if not self.run_network_bottom:
+            return
+
         if (time.time() - self.last_network_callback_time) <= args.rate:
             return
         bridge = cv_bridge.CvBridge()
@@ -243,6 +258,12 @@ class JetsonLiveObjectDetection():
         bottom_detections_pub.publish(detections_msg)
 
         self.last_network_callback_time = time.time()
+
+    def enable_front_callback(self, msg):
+        self.run_network_front = msg.data
+
+    def enable_bottom_callback(self, msg):
+        self.run_network_bottom = msg.data
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="This script runs inference on a trained object detection network")
@@ -267,10 +288,14 @@ if __name__ == "__main__":
         import cv_bridge
         import rospy
         from sensor_msgs.msg import Image
-        rospy.init_node('Network_Vision')
+        from std_msg.msg import Bool
         bridge = cv_bridge.CvBridge()
+
+        rospy.init_node('Network_Vision')
+        
         front_img_pub = rospy.Publisher('front_network_imgs', Image, queue_size=1)
         front_detections_pub = rospy.Publisher('front_network_output', Detections, queue_size=1)
+        
         bottom_img_pub = rospy.Publisher('bottom_network_imgs', Image, queue_size=1)
         bottom_detections_pub = rospy.Publisher('bottom_network_output', Detections, queue_size=1)
 
