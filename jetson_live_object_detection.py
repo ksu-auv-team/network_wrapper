@@ -158,14 +158,14 @@ class JetsonLiveObjectDetection():
                     # Publish ros-bridged images
                     if not args.no_ros:
                         img_msg = bridge.cv2_to_imgmsg(img)
-                        img_pub.publish(img_msg)
+                        front_img_pub.publish(img_msg)
 
                         detections_msg = Detections()
                         detections_msg.scores = scores
                         detections_msg.boxes = boxes.flatten()
                         detections_msg.classes = classes
                         detections_msg.detected = [num_detections]
-                        detections_pub.publish(detections_msg)
+                        front_detections_pub.publish(detections_msg)
 
                     print ("Network running at: " + str(1.0/(time.time() - curr_time)) + " Hz.")
 
@@ -182,10 +182,11 @@ class JetsonLiveObjectDetection():
 
         # Run the code as a ROS node, pulls images on a topic, published them out on antoher
         else:
-            rospy.Subscriber('raw_imgs', Image, self.run_network_node, queue_size=1)
+            rospy.Subscriber('front_raw_imgs', Image, self.run_network_node_front, queue_size=1)
+            rospy.Subscriber('bottom_raw_imgs', Image, self.run_network_node_bottom, queue_size=1)
             rospy.spin()
 
-    def run_network_node(self, msg):
+    def run_network_node_front(self, msg):
         ''' Runs network node on the recevial of an image from ROS 
 
         Args:
@@ -203,14 +204,43 @@ class JetsonLiveObjectDetection():
         print ("Found objects: " + str(' '.join(new_detections)) + ".")
 
         img_msg = bridge.cv2_to_imgmsg(img)
-        img_pub.publish(img_msg)
+        front_img_pub.publish(img_msg)
 
         detections_msg = Detections()
         detections_msg.scores = scores
         detections_msg.boxes = boxes.flatten()
         detections_msg.classes = classes
         detections_msg.detected = [num_detections]
-        detections_pub.publish(detections_msg)
+        front_detections_pub.publish(detections_msg)
+
+        self.last_network_callback_time = time.time()
+
+    def run_network_node_bottom(self, msg):
+        ''' Runs network node on the recevial of an image from ROS 
+
+        Args:
+            msg: ROS OpenCV Brige message, image to process on 
+        '''
+
+        if (time.time() - self.last_network_callback_time) <= args.rate:
+            return
+        bridge = cv_bridge.CvBridge()
+        img = bridge.imgmsg_to_cv2(msg)
+
+        scores, boxes, classes, num_detections = self.detector.detect(img)
+        new_detections = None
+        img, new_detections = self._visualizeDetections(img, scores, boxes, classes, num_detections)
+        print ("Found objects: " + str(' '.join(new_detections)) + ".")
+
+        img_msg = bridge.cv2_to_imgmsg(img)
+        bottom_img_pub.publish(img_msg)
+
+        detections_msg = Detections()
+        detections_msg.scores = scores
+        detections_msg.boxes = boxes.flatten()
+        detections_msg.classes = classes
+        detections_msg.detected = [num_detections]
+        bottom_detections_pub.publish(detections_msg)
 
         self.last_network_callback_time = time.time()
 
@@ -238,9 +268,11 @@ if __name__ == "__main__":
         import rospy
         from sensor_msgs.msg import Image
         rospy.init_node('Network_Vision')
-        img_pub = rospy.Publisher('network_imgs', Image, queue_size=1)
         bridge = cv_bridge.CvBridge()
-        detections_pub = rospy.Publisher('network_output', Detections, queue_size=1)
+        front_img_pub = rospy.Publisher('front_network_imgs', Image, queue_size=1)
+        front_detections_pub = rospy.Publisher('front_network_output', Detections, queue_size=1)
+        bottom_img_pub = rospy.Publisher('bottom_network_imgs', Image, queue_size=1)
+        bottom_detections_pub = rospy.Publisher('bottom_network_output', Detections, queue_size=1)
 
     test_video_picture = None
     if args.test_video is not None and args.test_picture is not None:
