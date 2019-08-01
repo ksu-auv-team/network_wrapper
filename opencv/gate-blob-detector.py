@@ -58,7 +58,7 @@ def raw_img_callback(msg):
         #double-check rectangle proportions to make sure there's nothing screwy going on
         if not h < 5 * w:
             o_rects.append([x, y, w + x, h + y])
-            cv2.rectangle(image, (x,y), (x+w,y+h), (0, 255, 0), 2)
+            cv2.rectangle(image, (x,y), (x+w,y+h), (0, 128, 255), 2)
 
     for c in b_contours:
         if cv2.contourArea(c) < 3000:
@@ -124,6 +124,7 @@ if __name__ == "__main__":
     parser.add_argument('-n', '--class_num', default="8", type=int, help="index of class that will be returned (default is 8, which is the sgate)")
     parser.add_argument('-b', '--bottom', action='store_true', help='send images on bottom camera topic instead of front camera topic')
     parser.add_argument('-s', '--show', action='store_true', help='display images locally with opencv')
+    parser.add_argument('-d', '--debug', action='store_true', help='print more and display all bounding boxes locally')
 
     args = parser.parse_args()
 
