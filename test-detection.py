@@ -17,6 +17,7 @@ def distance (p1, p2):
     return math.sqrt(((p2[0] - p1[0]) ** 2) + ((p2[1] - p1[1]) ** 2))
 
 def raw_img_callback(msg):
+    bridge = cv_bridge.CvBridge()
     image = bridge.imgmsg_to_cv2(msg)
 
     # print('image received', time.time())
@@ -33,6 +34,11 @@ def raw_img_callback(msg):
     # Finds contours
     im2, contours, hierarchy = cv2.findContours(mask.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
+    x = None
+    y = None
+    w = None
+    h = None
+
     # Draws contours
     for c in contours:
         if cv2.contourArea(c) < 3000:
@@ -41,18 +47,19 @@ def raw_img_callback(msg):
         (x, y, w, h) = cv2.boundingRect(c)
         cv2.rectangle(image, (x,y), (x+w,y+h), (0, 255, 0), 2)    
 
-    #publish image & detection
-    img_msg = bridge.cv2_to_imgmsg(img)
-    img_pub.publish(img_msg)
+    if x is not None:
+        #publish image & detection
+        img_msg = bridge.cv2_to_imgmsg(image)
+        img_pub.publish(img_msg)
 
-    img_h, img_w, img_chan = img.shape
+        img_h, img_w, img_chan = image.shape
 
-    detections_msg = Detections()
-    detections_msg.scores = [1]
-    detections_msg.boxes = [x/img_w, y/img_h, x - w / img_w, y - h / img_h]
-    detections_msg.classes = [args.class_num]
-    detections_msg.detected = [1]
-    front_detections_pub.publish(detections_msg)
+        detections_msg = Detections()
+        detections_msg.scores = [1]
+        detections_msg.boxes = [x/img_w, y/img_h, (x + w) / img_w, (y + h) / img_h]
+        detections_msg.classes = [args.class_num]
+        detections_msg.detected = [1]
+        det_pub.publish(detections_msg)
 
     # cv2.imshow('arms', image)
     # cv2.waitKey(1)
