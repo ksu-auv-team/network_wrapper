@@ -75,37 +75,42 @@ def raw_img_callback(msg):
     #i.e. make sure the posts are actually below the ends of the crossbar
 
 
+    print(o_rects)
+    print(b_rects)
     #combine two lists into one
     rects = o_rects
-    rects.append(b_rects)
+    rects.extend(b_rects)
 
     img_h, img_w, img_chan = image.shape
 
     #convert to neural network coordinate system
     #top left of img is origin, bottom right is (1, 1)
     for r in rects:
-        pass
-      #do this in a second once tyler pushes code
+        r[0] = r[0] / img_w
+        r[1] = r[1] / img_h
+        r[2] = r[2] / img_w
+        r[3] = r[3] / img_h
+        #do this in a second once tyler pushes code
 
-
-    #combine bounding boxes into larger bounding box
-    x_min = min([box[0] for box in rects])
-    y_min = min([box[1] for box in rects])
-    x_max = max([box[2] for box in rects])
-    y_max = max([box[3] for box in rects])
-    full_box = [x_min, y_min, x_max, y_max]
 
     #publish image & detection
     img_msg = bridge.cv2_to_imgmsg(image)
     img_pub.publish(img_msg)
 
+    #combine bounding boxes into larger bounding box
+    if rects:
+        x_min = min([box[0] for box in rects])
+        y_min = min([box[1] for box in rects])
+        x_max = max([box[2] for box in rects])
+        y_max = max([box[3] for box in rects])
+        full_box = [x_min, y_min, x_max, y_max]
 
-    detections_msg = Detections()
-    detections_msg.scores = [1.0]
-    detections_msg.boxes = [full_box]
-    detections_msg.classes = [args.class_num]
-    detections_msg.detected = [1]
-    det_pub.publish(detections_msg)
+        detections_msg = Detections()
+        detections_msg.scores = [1.0]
+        detections_msg.boxes = [full_box]
+        detections_msg.classes = [args.class_num]
+        detections_msg.detected = [1]
+        det_pub.publish(detections_msg)
 
     if args.show:
         cv2.imshow('gate_blob_detector', image)
