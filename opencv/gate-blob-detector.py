@@ -30,13 +30,13 @@ def raw_img_callback(msg):
 
 
     #get posts
-    orange_mask = cv2.inRange(image, orange_upper, orange_upper)
+    orange_mask = cv2.inRange(image, orange_lower, orange_upper)
 
     orange_mask = cv2.erode(orange_mask, None, iterations=2)
     orange_mask = cv2.dilate(orange_mask, None, iterations=2)
 
     #get crossbar
-    black_mask = cv2.inRange(image, orange_upper, orange_upper)
+    black_mask = cv2.inRange(image, black_lower, black_upper)
     black_mask = cv2.erode(black_mask, None, iterations=2)
     black_mask = cv2.dilate(black_mask, None, iterations=2)
 
@@ -52,11 +52,12 @@ def raw_img_callback(msg):
         if cv2.contourArea(c) < 3000:
             continue
 
+
         #top left point, plus width and height
         (x, y, w, h) = cv2.boundingRect(c)
 
         #double-check rectangle proportions to make sure there's nothing screwy going on
-        if not h < 5 * w:
+        if not h > w:
             o_rects.append([x, y, w + x, h + y])
             cv2.rectangle(image, (x,y), (x+w,y+h), (0, 128, 255), 2)
 
@@ -67,9 +68,9 @@ def raw_img_callback(msg):
         (x, y, w, h) = cv2.boundingRect(c)
         
         #double-check rectangle proportions to make sure there's nothing screwy going on
-        if not w < 5 * h:
-            b_rects.append([x, y, w + h, h + y])
-            cv2.rectangle(image, (x,y), (x+w,y+h), (0, 255, 0), 2)
+        # if not w < 5 * h:
+        b_rects.append([x, y, w + h, h + y])
+        cv2.rectangle(image, (x,y), (x+w,y+h), (0, 255, 0), 2)
         
     #could check something about relative position of black and orange boxes here - may do that later
     #i.e. make sure the posts are actually below the ends of the crossbar
@@ -83,7 +84,7 @@ def raw_img_callback(msg):
 
     img_h, img_w, img_chan = image.shape
 
-    #convert to neural network coordinate system
+    #convert to neural network coordinate system 
     #top left of img is origin, bottom right is (1, 1)
     for r in rects:
         r[0] = r[0] / img_w
@@ -112,7 +113,7 @@ def raw_img_callback(msg):
         detections_msg.detected = [1]
         det_pub.publish(detections_msg)
 
-    if args.show:
+    if args.show or args.debug:
         cv2.imshow('gate_blob_detector', image)
         cv2.waitKey(1)
 
