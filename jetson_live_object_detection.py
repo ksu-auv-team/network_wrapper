@@ -188,7 +188,7 @@ class JetsonLiveObjectDetection():
         # Run the code as a ROS node, pulls images on a topic, published them out on antoher
         else:
             rospy.Subscriber('front_raw_imgs', Image, self.run_network_node_front, queue_size=1)
-            rospy.Subscriber('bottom_raw_imgs', Image, self.run_network_node_bottom, queue_size=1)
+            #rospy.Subscriber('bottom_raw_imgs', Image, self.run_network_node_bottom, queue_size=1)
             rospy.Subscriber('enable_front_network', Bool, self.enable_front_callback)
             rospy.Subscriber('enable_bottom_network', Bool, self.enable_bottom_callback)
             rospy.spin()
@@ -248,7 +248,7 @@ class JetsonLiveObjectDetection():
         print ("Found Bottom objects: " + str(' '.join(new_detections)) + ".")
 
         img_msg = bridge.cv2_to_imgmsg(img)
-        bottom_img_pub.publish(img_msg)
+        #bottom_img_pub.publish(img_msg)
 
         detections_msg = Detections()
         detections_msg.scores = scores
@@ -298,8 +298,8 @@ if __name__ == "__main__":
         front_img_pub = rospy.Publisher('front_network_imgs', Image, queue_size=1)
         front_detections_pub = rospy.Publisher('front_network_output', Detections, queue_size=1)
         
-        bottom_img_pub = rospy.Publisher('bottom_network_imgs', Image, queue_size=1)
-        bottom_detections_pub = rospy.Publisher('bottom_network_output', Detections, queue_size=1)
+        #bottom_img_pub = rospy.Publisher('bottom_network_imgs', Image, queue_size=1)
+        #bottom_detections_pub = rospy.Publisher('bottom_network_output', Detections, queue_size=1)
 
     test_video_picture = None
     if args.test_video is not None and args.test_picture is not None:
