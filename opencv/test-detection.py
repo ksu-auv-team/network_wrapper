@@ -23,8 +23,8 @@ def raw_img_callback(msg):
     # print('image received', time.time())
 
     # BGR values
-    lower_marker = np.array([0, 40, 80])
-    upper_marker = np.array([67, 180, 255])
+    lower_marker = np.array([0, 40, 120])
+    upper_marker = np.array([140, 180, 255])
 
     mask = cv2.inRange(image, lower_marker, upper_marker)
 
