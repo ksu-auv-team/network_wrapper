@@ -1,4 +1,4 @@
-# Jetson_Nano_Inference
+# network_wrapper
 Jetson Nano ML install scripts, automated optimization of robotics detection models, and easy to use debugging flags
 
 ## Motivation
@@ -11,7 +11,7 @@ In the repository, you'll find a few key things:
 
 ### Quick setup
 
-If you just want to see if your nano can download and run a stock neural network without digging into any of the nitty-gritty, run the following from the root `jetson_nano_inference` directory:
+If you just want to see if your nano can download and run a stock neural network without digging into any of the nitty-gritty, run the following from the root `network_wrapper` directory:
 
 * NOTE: you will need a USB webcam plugged in, and internet access.
 
@@ -93,7 +93,7 @@ python3 jetson_live_object_detection.py -m example_layout --testPicture example_
 
 you can string together as many (or as few) of these commands as you want, and you can see a full list of commands with --help
 
-## Catkin_Ws
+## catkin_ws
 ```bash
 cd /path/to/jetson_nano_inference
 echo "source $(pwd)/catkin_ws/devel/setup.bash" >> ~/.bashrc
