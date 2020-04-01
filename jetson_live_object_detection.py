@@ -286,7 +286,8 @@ if __name__ == "__main__":
     parser.add_argument('--front-start-on', action='store_true', help='Will start with the front camera node running')
     parser.add_argument('--bottom-start-on', action='store_true', help='Will start with the bottom camera node running')
 
-    args = parser.parse_args()
+    if args.no_ros:
+        args = parser.parse_args()
 
     if not args.no_ros:
         import cv_bridge
@@ -294,6 +295,8 @@ if __name__ == "__main__":
         from sensor_msgs.msg import Image
         from std_msgs.msg import Bool
         bridge = cv_bridge.CvBridge()
+
+        args = parser.parse_args(rospy.myargv()[1:])
 
         rospy.init_node('Network_Vision')
         
