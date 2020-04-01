@@ -20,7 +20,7 @@ def raw_img_callback(msg):
     bridge = cv_bridge.CvBridge()
     image = bridge.imgmsg_to_cv2(msg)
 
-    # print('image received', time.time())
+    # rospy.loginfo('image received', time.time())
 
     # BGR values
     lower_marker = np.array([0, 40, 120])
@@ -67,7 +67,7 @@ def raw_img_callback(msg):
         cv2.imshow('marker-detection', image)
         cv2.waitKey(1)
 
-    print('image processed', time.time())
+    rospy.loginfo('image processed', time.time())
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="This script gets a bounding box from an orange thing. Intended to be used for testing.")
@@ -92,7 +92,7 @@ if __name__ == "__main__":
     else:
         rospy.Subscriber('front_raw_imgs', Image, raw_img_callback, queue_size=1)
 
-    print('started')
-
     rospy.init_node('test_detection_node', anonymous=True)
+    rospy.loginfo('started')
+
     rospy.spin()

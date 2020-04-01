@@ -27,7 +27,7 @@ def distance (p1, p2):
 def raw_img_callback(msg):
     img = bridge.imgmsg_to_cv2(msg)
 
-    # print('image received', time.time())
+    # rospy.loginfo('image received', time.time())
 
     # BGR values
     buoy_white_lower = np.array([200, 200, 75])
@@ -91,7 +91,7 @@ def raw_img_callback(msg):
         cv2.imshow('buoy_contours', c_img)
         cv2.waitKey(1)
 
-    print('image processed', time.time())
+    rospy.loginfo('image processed', time.time())
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="This script gets a bounding box from a buoy. Intended to be used for testing.")
@@ -118,7 +118,7 @@ if __name__ == "__main__":
     else:
         rospy.Subscriber('front_raw_imgs', Image, raw_img_callback, queue_size=1)
 
-    print('started')
+    rospy.loginfo('started')
 
     rospy.init_node('buoy_detector', anonymous=True)
     rospy.spin()
