@@ -8,9 +8,9 @@ sudo apt-get install python3-pandas
 sudo pip3 install -U pip
 
 sudo apt-get install zlib1g-dev zip libjpeg8-dev libhdf5-dev hdf5-tools
-sudo pip3 install -U numpy grpcio absl-py py-cpuinfo psutil portpicker grpcio six mock requests gast h5py astor termcolor jupyter
+sudo pip3 install -U numpy grpcio==1.22.1 absl-py py-cpuinfo psutil portpicker grpcio six mock requests gast h5py astor termcolor jupyter
 sudo pip3 install protobuf==3.6.1
-sudp pip3 install tqdm
+sudo pip3 install tqdm
 sudo pip3 install sklearn
 
 sudo pip3 install --extra-index-url https://developer.download.nvidia.com/compute/redist/jp/v42 tensorflow-gpu==1.13.1+nv19.4
