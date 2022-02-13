@@ -4,6 +4,7 @@ import glob
 import pandas as pd
 import argparse
 import xml.etree.ElementTree as ET
+from math import trunc;
 
 
 def __list_to_csv(annotations, output_file):
@@ -24,8 +25,9 @@ def xml_to_csv(xml_dir, output_file):
             value = (root.find('filename').text,
                      int(root.find('size')[0].text),
                      int(root.find('size')[1].text), member[0].text,
-                     int(member[4][0].text), int(member[4][1].text),
-                     int(member[4][2].text), int(member[4][3].text))
+                     float(member[4][0].text), float(member[4][1].text),
+                     float(member[4][2].text), float(member[4][3].text))
+            print(value)
             annotations.append(value)
 
     __list_to_csv(annotations, output_file)
